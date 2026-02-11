@@ -12,15 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api") // Base changed to /api to match requirements
+@RequestMapping("/api/v1") // Using v1 to match standard API structures
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserRepository userRepository;
 
     /**
-     * Requirement: /api/public/health (public)
-     * No @PreAuthorize needed because SecurityConfig permits all on this path.
+     * Requirement: /api/v1/public/health
      */
     @GetMapping("/public/health")
     public ResponseEntity<Map<String, String>> health() {
@@ -28,7 +27,7 @@ public class UserController {
     }
 
     /**
-     * Requirement: /api/user/me (requires authentication)
+     * Requirement: /api/v1/user/me
      */
     @GetMapping("/user/me")
     @PreAuthorize("isAuthenticated()")
@@ -40,12 +39,7 @@ public class UserController {
     }
 
     /**
-     * Requirement: /api/admin/users (requires ROLE_ADMIN)
+     * NOTE: The conflicting /admin/users was removed from here.
+     * Admin functionality should stay in AdminController.
      */
-    @GetMapping("/admin/users")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> getAllUsers() {
-        // Returns all users from the DB - Only visible to Admins
-        return ResponseEntity.ok(userRepository.findAll());
-    }
 }
