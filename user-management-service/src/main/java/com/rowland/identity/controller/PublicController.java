@@ -1,4 +1,4 @@
-package com.rowland.security.user_management_service.controller;
+package com.rowland.identity.controller; // Changed from security.user_management_service to identity
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,9 +10,6 @@ import java.util.Map;
 @RequestMapping("/api/public")
 public class PublicController {
 
-    @GetMapping("/health")
-    public Map<String, String> health() {
-        // Map.of is an immutable factory method introduced in Java 9
-        return Map.of("status", "UP");
-    }
+    @GetMapping("/test")
+    public String test() { return "I am alive"; }
 }

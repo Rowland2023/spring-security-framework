@@ -1,49 +1,41 @@
-package com.rowland.identity.entity;
+package com.rowland.identity.model;
 
-import com.rowland.identity.model.Role; // Import your Enum
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.List;
 
-@Entity
-@Table(name = "users")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity implements UserDetails {
+@Entity
+@Table(name = "users") // Maps to your 'users' table in Postgres
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     
     @Column(unique = true)
     private String username;
     
     private String password;
 
-    // Change from String to Role enum
-    @Enumerated(EnumType.STRING) 
-    private Role role; 
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
+    // Spring Security Methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Spring Security likes roles to start with "ROLE_"
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
     }
 
     @Override

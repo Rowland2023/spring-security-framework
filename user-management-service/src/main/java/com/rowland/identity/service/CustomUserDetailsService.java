@@ -1,8 +1,5 @@
-package com.rowland.security.user_management_service.service;
-// Change this:
-// import com.rowland.security.user_management_service.repository.UserRepository;
+package com.rowland.identity.service; // Use the 'identity' package
 
-// To the actual path, likely:
 import com.rowland.identity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,13 +8,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor // Automatically generates the constructor for all 'final' fields
+@RequiredArgsConstructor 
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // This links your PostgreSQL user data to Spring Security
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
     }
