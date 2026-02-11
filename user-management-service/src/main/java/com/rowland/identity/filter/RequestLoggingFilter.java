@@ -1,4 +1,4 @@
-package com.rowland.security.user_management_service.filter;
+package com.rowland.identity.filter; // Updated package name
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,7 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Slf4j // Lombok annotation for private static final Logger log
+@Slf4j
 @Component
 public class RequestLoggingFilter extends OncePerRequestFilter {
 
@@ -22,11 +22,10 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
             
-        // Proceed with the filter chain first so that the JWT filter 
-        // has a chance to populate the SecurityContext
+        // Proceed with the filter chain first
         chain.doFilter(request, response);
 
-        // Post-processing log: Now we know WHO the user is
+        // Post-processing log: Captures the user identity after JWT filter has run
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()) {
             log.info("User: {} | Method: {} | URI: {} | Status: {}", 

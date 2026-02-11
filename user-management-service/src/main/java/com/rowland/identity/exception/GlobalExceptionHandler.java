@@ -1,5 +1,6 @@
 package com.rowland.identity.exception;
 
+import com.rowland.security.exception.SecurityFrameworkException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,17 +17,25 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
-        return buildResponse(HttpStatus.FORBIDDEN, "Forbidden", "You do not have permission to access this resource");
+    // 1. Handles Security Framework specific errors
+    @ExceptionHandler(SecurityFrameworkException.class)
+    public ResponseEntity<Map<String, Object>> handleSecurityFramework(SecurityFrameworkException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Security Framework Error", ex.getMessage());
     }
 
+    // 2. Handles Spring Security "Unauthorized" (Bad Credentials, Invalid Token)
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, Object>> handleAuth(AuthenticationException ex) {
         return buildResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage());
     }
 
-    // New: Handles @Valid failures (e.g., email validation, password length)
+    // 3. Handles Role/Permission issues
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, "Forbidden", "You do not have permission to access this resource");
+    }
+
+    // 4. Handles @Valid failures (e.g., malformed JSON or validation rules)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         String details = ex.getBindingResult().getFieldErrors().stream()
@@ -35,10 +44,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Validation Failed", details);
     }
 
+    // 5. Catch-all for 500 errors (REVEALS THE CAUSE FOR DEBUGGING)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleAll(Exception ex) {
-        // Log the actual exception here for debugging
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "An unexpected error occurred");
+        // We use ex.getMessage() here so your CURL response shows the real problem
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage());
     }
 
     private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String error, String message) {

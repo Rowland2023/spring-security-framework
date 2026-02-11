@@ -1,8 +1,8 @@
-package com.rowland.identity.controller;
+package com.rowland.identity.controller; // Ensure this matches your app's package structure
 
-import com.rowland.identity.dto.AuthenticationRequest; // You'll need to create this DTO
-import com.rowland.identity.dto.AuthenticationResponse; // And this one
-import com.rowland.identity.service.AuthenticationService; // And this service
+import com.rowland.identity.dto.AuthenticationRequest; // Update with your actual DTO package
+import com.rowland.identity.dto.AuthenticationResponse;
+import com.rowland.identity.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +21,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
+        // This method will now be correctly mapped by Spring DispatcherServlet
         return ResponseEntity.ok(service.authenticate(request));
     }
 }

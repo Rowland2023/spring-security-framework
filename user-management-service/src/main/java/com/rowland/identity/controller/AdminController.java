@@ -1,4 +1,4 @@
-package com.rowland.security.user_management_service.controller;
+package com.rowland.identity.controller; // Standard clean package name
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/admin") // Added versioning to distinguish from identity controller
+@RequestMapping("/api/v1/admin")
 public class AdminController {
 
     @GetMapping("/users")
