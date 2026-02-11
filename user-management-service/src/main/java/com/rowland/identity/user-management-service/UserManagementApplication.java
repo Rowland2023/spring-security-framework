@@ -8,7 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@SpringBootApplication
+// The scanBasePackages tells Spring to look for @Component and @Configuration 
+// in both the identity and security folders.
+@SpringBootApplication(scanBasePackages = "com.rowland")
 public class UserManagementApplication {
 
     public static void main(String[] args) {
@@ -25,12 +27,13 @@ public class UserManagementApplication {
             if (repository.findByUsername("admin").isEmpty()) {
                 UserEntity admin = UserEntity.builder()
                         .username("admin")
-                        // Use the encoder from your starter library!
                         .password(passwordEncoder.encode("admin123")) 
                         .role("ROLE_ADMIN")
                         .build();
                 repository.save(admin);
                 System.out.println("✅ Default Admin created: admin/admin123");
+            } else {
+                System.out.println("ℹ️ Admin user already exists in database.");
             }
         };
     }
