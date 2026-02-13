@@ -16,7 +16,7 @@ A reusable library encapsulating cross‑cutting concerns:
 * **Filter chains:** Custom security filters for token extraction.
 * **Role‑based access control (RBAC):** Method and URL-level security.
 * **Global exception handling:** Unified error responses.
-* **Request logging:** Principal-aware audit logs.
+
 
 It uses Spring Boot auto‑configuration via `AutoConfiguration.imports` to remain plug‑and‑play for any consuming service.
 
