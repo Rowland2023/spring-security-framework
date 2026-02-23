@@ -17,8 +17,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>security-spring-boot-starter</module>
-        <module>user-management-service</module>
+        <module>core-security-starter</module>
+        <module>sample-application</module>
     </modules>
 
     <properties>
@@ -30,14 +30,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.rowland.security</groupId>
-                <artifactId>security-spring-boot-starter</artifactId>
+                <artifactId>core-security-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             

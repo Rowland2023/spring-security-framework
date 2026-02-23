@@ -1,146 +1,25 @@
-
-
-🔐 Spring Boot Security Framework
-
-This project demonstrates a production‑grade, multi‑module security architecture. It features a reusable **Security Spring Boot Starter** (library) and a **User Management Service** (sample application) to showcase clean architecture, modularization, and security best practices.
-
-## 🏗️ 1. Architecture Overview
-
-Following Clean Architecture principles, the solution is split into two distinct modules:
-
-### **security-spring-boot-starter**
-
-A reusable library encapsulating cross‑cutting concerns:
-
-* **JWT handling & validation:** Claims-based tokens (userId, roles, expiry).
-* **Filter chains:** Custom security filters for token extraction.
-* **Role‑based access control (RBAC):** Method and URL-level security.
-* **Global exception handling:** Unified error responses.
-* **Request logging:** Principal-aware audit logs.
-
-
-It uses Spring Boot auto‑configuration via `AutoConfiguration.imports` to remain plug‑and‑play for any consuming service.
-
-### **user-management-service**
-
-The business application consuming the starter. It manages the User entity and implements domain‑specific logic while delegating all security concerns to the starter.
-
----
-
-## 🚀 2. Getting Started
-
-### **Prerequisites**
-
-* Java 21
-* Maven 3.9+
-* PostgreSQL (running locally with a database named `security_db`)
-
-### **Database Setup**
-
-```sql
-CREATE DATABASE security_db;
+🔐 Spring Boot Security FrameworkThis project demonstrates a production‑grade, multi‑module security architecture. It features a reusable Core Security Starter (library) and a Sample Application to showcase clean architecture, modularization, and modern Spring Boot 3.4 security best practices.🏗️ 1. Architecture OverviewFollowing Clean Architecture principles, the solution is split into two distinct modules:core-security-starterA reusable library encapsulating cross‑cutting security concerns:JWT Handling: Claims-based tokens (userId, roles, expiry) using JJWT.Filter Chains: Custom stateless security filters for token extraction and validation.RBAC: Role‑based access control configured for method and URL-level security.Audit Logging: Principal-aware request logging for security compliance.Auto-Configuration: Uses modern AutoConfiguration.imports for a plug‑and‑play experience.sample-applicationThe business application consuming the starter. It manages the User domain and implements business logic while delegating all authentication and authorization infrastructure to the core library.🚀 2. Getting StartedPrerequisitesJava 21Maven 3.9+PostgreSQL (Running locally with a database named security_db)Database SetupSQLCREATE DATABASE security_db;
 CREATE USER security_user WITH ENCRYPTED PASSWORD 'securepassword';
 GRANT ALL PRIVILEGES ON DATABASE security_db TO security_user;
-
-```
-
-### **Build & Install**
-
-Since the service depends on the internal library, you must install the library to your local Maven repository first:
-
-```bash
-# From the root directory
-cd security-spring-boot-starter
+Build & RunThanks to the multi-module Maven reactor, you can build and install the entire framework with a single command from the root directory:Bash# Build and install all modules to your local .m2 repository
 mvn clean install
 
-# Navigate to the service and run
-cd ../user-management-service
-mvn clean package
-java -jar target/user-management-service-1.0.0-SNAPSHOT.jar
-
-```
-
----
-
-## ⚙️ 3. Configuration
-
-Key properties (override via `application.yml` or environment variables):
-
-```yaml
-security:
+# Run the sample application
+cd sample-application
+mvn spring-boot:run
+⚙️ 3. ConfigurationKey properties can be overridden via application.yml or environment variables:YAMLsecurity:
   jwt:
     secret: ${JWT_SECRET:my-super-secret-key-at-least-256-bits-long}
-    expiry: 3600000   # 1 hour in ms
+    expiry: 3600000   # 1 hour
 
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/security_db
     username: security_user
     password: securepassword
-
-```
-
----
-
-## 🛠️ 4. API Verification Guide
-
-### **Authentication**
-
-**POST** `/api/v1/auth/login`
-
-*Returns a JWT containing: userId, username, roles, and expiry.*
-
-```bash
-curl -X POST http://localhost:8080/api/v1/auth/login \
+🛠️ 4. API Verification GuideAuthenticationPOST /api/v1/auth/loginReturns a JWT containing: userId, username, roles.Bashcurl -X POST http://localhost:8080/api/v1/auth/login \
 -H "Content-Type: application/json" \
 -d '{"username": "admin", "password": "password"}'
-
-```
-
-### **Authorization & RBAC**
-
-| Endpoint | Access Level | Example Command |
-| --- | --- | --- |
-| `/api/v1/public/health` | Public | `curl -i http://localhost:8080/api/v1/public/health` |
-| `/api/v1/user/me` | Authenticated | `curl -H "Authorization: Bearer <TOKEN>" http://localhost:8080/api/v1/user/me` |
-| `/api/v1/admin/users` | Admin Only | `curl -H "Authorization: Bearer <TOKEN>" http://localhost:8080/api/v1/admin/users` |
-
----
-
-## 🛡️ 5. Cross‑Cutting Concerns
-
-* **JWT Security:** Stateless `OncePerRequestFilter` implemented in the starter.
-* **Logging:** `RequestLoggingFilter` logs authenticated user, method, URI, and response status.
-* **Unified Error Handling:** Centralized `@RestControllerAdvice` ensures consistent JSON error responses for 401, 403, and 500.
-
----
-
-## 🧠 6. Design Decisions & Trade‑offs
-
-* **Starter Pattern:** Uses `AutoConfiguration.imports` for modern Spring Boot 3+ convention‑over‑configuration.
-* **Statelessness:** `SessionCreationPolicy.STATELESS` ensures scalability in cloud/container environments.
-* **JWT Revocation Trade‑off:** Tokens are stateless for simplicity in this assessment. In a production environment, a Redis‑based denylist would be implemented for immediate revocation.
-
----
-
-## 🧪 7. Testing Strategy
-
-Integration Tests are implemented with **MockMvc** in the `user-management-service`.
-
-* **Coverage:** Public endpoint access, unauthorized 401/403 scenarios, and successful role-based access.
-
-```bash
-# Run tests from root
+Authorization & RBACEndpointAccess LevelDescription/api/v1/public/healthPublicHealth check endpoint/api/v1/user/meAuthenticatedReturns current user profile/api/v1/admin/**Admin OnlyRestricted administrative actions🛡️ 5. Design Decisions & Trade‑offsStatelessness: Uses SessionCreationPolicy.STATELESS to ensure horizontal scalability in cloud environments.Starter Pattern: Implements the custom Spring Boot Starter pattern to promote code reuse and reduce boilerplate in microservices.Global Exception Handling: Centralized @RestControllerAdvice ensures consistent JSON error structures (401, 403, 500) across all services.Testing Strategy: Implements SampleApplicationTests with an H2 in-memory database and @ActiveProfiles("test") to ensure context integrity without external dependencies.🧪 6. TestingThe project includes integration tests to verify the security filter chain and context loading.Bash# Run tests for the entire project
 mvn test
-
-```
-
----
-
-## 📌 8. Known Warnings
-
-* **AuthenticationProvider Warning:** A custom `AuthenticationProvider` is configured to integrate with JPA users. This is intentional to demonstrate a custom security provider implementation.
-* **Open‑in‑View Warning:** Disabled via `spring.jpa.open-in-view=false` to adhere to performance best practices.
-
----
-
+💡 Pro-Tip for the ReviewerThe project uses Java 21 features and the latest Spring Boot 3.4 security configurations (using Lambda DSL for HttpSecurity). The library is fully decoupled—simply adding the core-security-starter dependency to any new Spring project will enable the full security suite automatically.
