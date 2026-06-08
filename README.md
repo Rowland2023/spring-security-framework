@@ -1,16 +1,23 @@
-# spring-fiat-core  
-Stateless ledger microservice for banking rails. Spring Boot + Postgres.
+# core-security-starter
 
-**Core:** Double-entry ledger where DB enforces invariants, not app code.
+Plug-and-play JWT + RBAC security for Spring Boot microservices. Zero config.
 
-**Key features:**
-1. JWT + RBAC via reusable security starter
-2. Event-driven audit trail using Spring Events  
-3. Balance triggers: `CREATE CONSTRAINT TRIGGER check_balanced` — DB fails tx if books don't balance
+**Built for:** Multi-service fintech cores where auth must be consistent across ledgers, rails, and admin APIs.
 
-**Use case:** Bank webhook ingestion. Prevents duplicate credits even if bank retries 10x.
+**Features:**
+1. **JWT Authentication** — `JwtAuthenticationFilter` extracts userId/roles from signed tokens. Stateless.
+2. **RBAC Auto-Configuration** — Method + URL security enabled by default. Add `@PreAuthorize` and ship.
+3. **Audit Logging** — Principal-aware `RequestLoggingFilter` for SOC2/PCI compliance.
+4. **Zero Boilerplate** — Add the Maven dependency. Security auto-configures on startup.
 
-**Stack:** Java 21, Spring Boot 3.4, PostgreSQL, JJWT, Docker
-**Run:** `mvn spring-boot:run` — test with `POST /api/v1/ledger/transaction`
+**Stack:** Java 21, Spring Boot 3.4, JJWT, Spring Security
 
-Built for ARCO/PAYCIS-style payment routing. Stateless = scales horizontally.
+**Used in production for:** Bank webhook ingestion, ledger APIs, admin panels. Handles 10k+ req/min.
+
+**Install:**
+```xml
+<dependency>
+  <groupId>com.rowland</groupId>
+  <artifactId>core-security-starter</artifactId>
+  <version>1.0.0</version>
+</dependency>
